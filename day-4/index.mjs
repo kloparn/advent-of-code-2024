@@ -1,6 +1,6 @@
 import fs from "fs";
 
-const data = fs.readFileSync("example", "utf8").trim().split("\n");
+const data = fs.readFileSync("data", "utf8").trim().split("\n");
 
 // get all the x positions for each row.
 const xPositions = data.map((row) => [...row.matchAll(/X/g)].map((it) => it.index)).reduce((acc, curr, index) => {
@@ -81,8 +81,6 @@ while(queue.length > 0) {
   }
 }
 
-// about 700~ms, Dynamic programming approach, could be faster with more rules, or less checks.
-console.log("Part 1: ", xMasCount, "Time: ", performance.now() - start + "ms");
 
 const directions = {
   "left" : -1,
@@ -93,21 +91,65 @@ const directions = {
 
 // Part 2
 
-/*
-  The pattern has changed, Now we need to look for X-mas patterns, and count them.
-  A pattern is if the word MAS is in a cross.
-  Example:
-    M.S
-    .A.
-    M.S
+const end = performance.now();
+const start2 = performance.now();
 
-  it SHOULD look exactly like this, but it could be rotated, so we need to check all 4 directions of the M spot.
+const aPositions = data.map((row) => [...row.matchAll(/A/g)].map((it) => it.index)).reduce((acc, curr, index) => {
+  acc.push(curr.map((it) => ({ xIndex: it, yIndex: index })));
+  return acc;
+}, []).flat()
 
-  Now it's less looking for X with regex and more M.A.S with a 3x3 matrix, should be faster as we don't need to path find.
-*/
+let xMasCount2 = 0;
 
-const mPositions = data.map((row) => [...row.matchAll(/M/g)].map((it) => it.index))
+for (const aPosition of aPositions) {
+  // Check only diagonals from the A Position.
 
-const validMPositions = mPositions.reduce((acc, mPosition, rowIndex) => {
-  mPosition
-}, []);
+  const { yIndex, xIndex } = aPosition;
+  const { left, right, up, down } = directions;
+
+  // If we at an edge, we do not need to check the diagonals.
+  if (yIndex === 0 || yIndex === data.length - 1 || xIndex === 0 || xIndex === data[yIndex].length - 1) {
+    continue;
+  }
+
+  /*
+    if check looking for this pattern
+      M . S
+      . A .
+      M . S
+
+      This pattern can be rotated in 4 ways, so we need to check all 4.
+  */
+
+  if (data[yIndex + up]?.[xIndex + left] === "M" && data[yIndex + down]?.[xIndex + right] === "S") {
+    if (data[yIndex + down]?.[xIndex + left] === "M" && data[yIndex + up]?.[xIndex + right] === "S") {
+      xMasCount2++;
+    } else if (data[yIndex + up]?.[xIndex + right] === "M" && data[yIndex + down]?.[xIndex + left] === "S") {
+      xMasCount2++;
+    }
+  } else if (data[yIndex + up]?.[xIndex + right] === "M" && data[yIndex + down]?.[xIndex + left] === "S") {
+    if (data[yIndex + down]?.[xIndex + right] === "M" && data[yIndex + up]?.[xIndex + left] === "S") {
+      xMasCount2++;
+    } else if (data[yIndex + up]?.[xIndex + left] === "M" && data[yIndex + down]?.[xIndex + right] === "S") {
+      xMasCount2++;
+    }
+  } else if (data[yIndex + down]?.[xIndex + left] === "M" && data[yIndex + up]?.[xIndex + right] === "S") {
+    if (data[yIndex + up]?.[xIndex + left] === "M" && data[yIndex + down]?.[xIndex + right] === "S") {
+      xMasCount2++;
+    } else if (data[yIndex + down]?.[xIndex + right] === "M" && data[yIndex + up]?.[xIndex + left] === "S") {
+      xMasCount2++;
+    }
+  } else if (data[yIndex + down]?.[xIndex + right] === "M" && data[yIndex + up]?.[xIndex + left] === "S") {
+    if (data[yIndex + up]?.[xIndex + right] === "M" && data[yIndex + down]?.[xIndex + left] === "S") {
+      xMasCount2++;
+    } else if (data[yIndex + down]?.[xIndex + left] === "M" && data[yIndex + up]?.[xIndex + right] === "S") {
+      xMasCount2++;
+    }
+  }
+}
+
+console.log("Part 1: ", xMasCount, "Time: ", end - start + "ms");
+console.log("Part 2: ", xMasCount2, "Time: ", performance.now() - start2 + "ms");
+
+// Pc: 1300ms, mac: 700ms.
+// Dynamic programming approach, could be faster with more rules, or less checks.
