@@ -89,9 +89,10 @@ const directions = {
   "down": 1
 }
 
+const end = performance.now();
+
 // Part 2
 
-const end = performance.now();
 const start2 = performance.now();
 
 const aPositions = data.map((row) => [...row.matchAll(/A/g)].map((it) => it.index)).reduce((acc, curr, index) => {
