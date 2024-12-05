@@ -37,12 +37,6 @@ outer: for (const page of pages) {
   validPages.push(pageNumbers);
 }
 
-// part 1: get the middle section of each page and add them together
-console.log("Part 1:", validPages.reduce((acc, curr) => {
-  const middleIndex = Math.floor(curr.length / 2);
-  return acc + curr[middleIndex];
-}, 0))
-
 // part 2: order invalid pages by the rules then count the middle sections like before.
 
 const correctlyShuffled = [];
@@ -81,6 +75,13 @@ while(invalidPages.length) {
   invalidPages.shift();
 }
 
+// part 1: get the middle section of each page and add them together
+console.log("Part 1:", validPages.reduce((acc, curr) => {
+  const middleIndex = Math.floor(curr.length / 2);
+  return acc + curr[middleIndex];
+}, 0))
+
+// part 2: get the middle section of the newly reorganized pages and add them together
 console.log("Part 2:", correctlyShuffled.reduce((acc, curr) => {
   const middleIndex = Math.floor(curr.length / 2);
   return acc + curr[middleIndex];
